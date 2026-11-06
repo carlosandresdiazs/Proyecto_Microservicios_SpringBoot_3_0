@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: proyecto-03
+data:
+  AUTH_SERVICE_URL: http://auth-service:8081
+  USER_SERVICE_URL: http://user-service:8082
+  PRODUCT_SERVICE_URL: http://product-service:8083
+  PAYMENT_SERVICE_URL: http://payment-service:8084

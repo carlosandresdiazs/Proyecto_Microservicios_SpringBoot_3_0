@@ -1,0 +1,130 @@
+{
+  "info": {
+    "name": "Taller 02 v2.0 - Microservices",
+    "description": "Pruebas paso a paso para auth-service y user-service a través del API Gateway.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Autenticación",
+      "item": [
+        {
+          "name": "Registrar usuario nuevo",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"username\": \"carlos.demo\",\n  \"email\": \"carlos.demo@example.com\",\n  \"password\": \"Demo12345\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"]}
+          }
+        },
+        {
+          "name": "Login estudiante",
+          "event": [{
+            "listen": "test",
+            "script": {"exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json();",
+              "pm.environment.set('studentToken', data.accessToken);",
+              "pm.environment.set('studentId', data.userId);"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"username\": \"student\",\n  \"password\": \"Student123!\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"]}
+          }
+        },
+        {
+          "name": "Login administrador",
+          "event": [{
+            "listen": "test",
+            "script": {"exec": [
+              "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+              "const data = pm.response.json();",
+              "pm.environment.set('adminToken', data.accessToken);",
+              "pm.environment.set('adminId', data.userId);"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - CRUD de perfiles",
+      "item": [
+        {
+          "name": "POST crear mi perfil (student)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{studentToken}}", "type": "string"}]},
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"firstName\": \"Estudiante\",\n  \"lastName\": \"Demo\",\n  \"phone\": \"+57 300 111 2233\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"]}
+          }
+        },
+        {
+          "name": "GET mi perfil (student)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{studentToken}}", "type": "string"}]},
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api", "users", "me"]}
+          }
+        },
+        {
+          "name": "PUT actualizar mi perfil (student)",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{studentToken}}", "type": "string"}]},
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"firstName\": \"Estudiante\",\n  \"lastName\": \"Actualizado\",\n  \"phone\": \"+57 300 999 0000\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/users/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{studentId}}"]}
+          }
+        },
+        {
+          "name": "GET listar perfiles como ADMIN",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{adminToken}}", "type": "string"}]},
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"]}
+          }
+        },
+        {
+          "name": "DELETE perfil student como ADMIN",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{adminToken}}", "type": "string"}]},
+            "method": "DELETE",
+            "url": {"raw": "{{baseUrl}}/api/users/{{studentId}}", "host": ["{{baseUrl}}"], "path": ["api", "users", "{{studentId}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Seguridad y errores",
+      "item": [
+        {
+          "name": "GET perfiles sin JWT -> 401",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Debe devolver 401', function () { pm.response.to.have.status(401); });"]}}],
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"]}
+          }
+        },
+        {
+          "name": "GET perfiles como USER -> 403",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Debe devolver 403', function () { pm.response.to.have.status(403); });"]}}],
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{studentToken}}", "type": "string"}]},
+            "method": "GET",
+            "url": {"raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"]}
+          }
+        }
+      ]
+    }
+  ]
+}

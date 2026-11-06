@@ -1,0 +1,11 @@
+.git
+.github
+**/target
+.idea
+.vscode
+Taller_02_v2_Guia.docx
+postman
+
+.env
+secrets
+**/private.pem

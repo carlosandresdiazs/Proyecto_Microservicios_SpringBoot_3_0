@@ -1,0 +1,29 @@
+# Archivos compilados
+target/
+*.class
+*.jar
+*.war
+
+# Visual Studio Code
+.vscode/
+
+# Secretos y claves privadas
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+*.jks
+
+# Respaldos
+respaldo-proyecto03/
+respaldos-postgresql/
+*.dump
+*.sql
+
+# Archivos temporales
+*.log
+.DS_Store
+

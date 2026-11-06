@@ -1,0 +1,35 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: ${PAYMENT_DB_URL:jdbc:postgresql://payments-db:5432/payments_db}
+    username: ${PAYMENT_DB_USER:payments_app}
+    password: ${PAYMENT_DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH_ISSUER_URI:http://localhost:8085/realms/proyecto03}
+          jwk-set-uri: ${OAUTH_JWKS_URI:http://localhost:8085/realms/proyecto03/protocol/openid-connect/certs}
+app:
+  oauth:
+    audience: ${OAUTH_AUDIENCE:payments-api}
+  webhook:
+    secret: ${WEBHOOK_SECRET}
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info
